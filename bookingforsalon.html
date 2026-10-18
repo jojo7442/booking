@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حجز موعد | AS الجمانة ستايلك</title>
+<style>
+:root {
+  --wine:#641b2b;
+  --wine-dark:#39101a;
+  --gold:#c69a58;
+  --cream:#fff8f0;
+  --line:#e7c9ad;
+  --text:#421a22;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:linear-gradient(140deg,#fffaf4,#f4e1d6);
+  color:var(--text);
+  font-family:Tahoma,Arial,sans-serif;
+}
+header{text-align:center;padding:25px 15px 12px}
+.logo{
+  width:90px;height:90px;margin:auto auto 8px;
+  border:2px solid var(--gold);border-radius:50%;
+  display:grid;place-items:center;
+  font-family:Georgia,serif;font-size:43px;color:var(--wine);
+  background:#fffaf4;
+}
+.brand{font-family:Georgia,serif;letter-spacing:4px;font-size:21px}
+.tagline{font-size:11px;letter-spacing:2px;margin-top:5px}
+h1{font-size:25px;color:var(--wine);margin:20px 0 5px}
+.subtitle{font-size:13px;color:#78545a}
+main{
+  width:min(1100px,94%);margin:15px auto 35px;
+  display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.9fr);
+  gap:18px;align-items:start;
+}
+.panel{
+  background:#fffaf5e8;border:1px solid var(--line);
+  border-radius:20px;padding:20px;box-shadow:0 8px 25px #641b2b0d;
+}
+.panel h2{
+  margin:-4px 0 20px;background:var(--wine);color:white;
+  border-radius:12px;padding:13px;text-align:center;font-size:18px;
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:bold}
+input,select,textarea{
+  width:100%;border:1px solid #d9c1b0;border-radius:10px;
+  padding:12px;background:#fffdf9;color:var(--text);
+  font:inherit;font-size:14px;min-width:0;
+}
+textarea{resize:vertical;min-height:85px}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid #c69a5877;border-color:var(--gold)
+}
+.hint{font-size:11px;color:#866b68;line-height:1.8}
+button{
+  border:0;border-radius:11px;padding:13px 16px;
+  font:inherit;font-weight:bold;cursor:pointer;
+}
+.primary{background:var(--wine);color:white;width:100%;margin-top:18px}
+.secondary{background:#f1dfce;color:var(--wine)}
+.gold{background:var(--gold);color:#29140d}
+.payment-item{
+  border:1px solid var(--line);border-radius:11px;
+  padding:12px;margin-bottom:9px;background:#fffdf8
+}
+.payment-item strong{display:block;margin-bottom:5px}
+.account{font-size:12px;overflow-wrap:anywhere;direction:ltr;text-align:left}
+.social{line-height:2.2;font-size:13px}
+.notice{
+  background:#f7ebdf;border-radius:12px;padding:12px;
+  font-size:12px;line-height:1.9;margin-top:14px
+}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.preview{margin-top:20px}
+#bookingCanvas{width:100%;border:1px solid var(--line);border-radius:12px;background:white}
+footer{text-align:center;padding:20px;color:#805e5d;font-size:12px}
+@media(max-width:760px){
+  main{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AS</div>
+  <div class="brand">ALJUMANA STYLEK</div>
+  <div class="tagline">BEAUTY WITH ELEGANCE</div>
+  <h1>احجزي موعدك الآن</h1>
+  <div class="subtitle">لأنكِ تستحقين الأفضل ✦</div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>✦ بيانات الحجز</h2>
+
+    <form id="bookingForm">
+      <div class="grid">
+        <div class="field">
+          <label for="name">الاسم الكامل *</label>
+          <input id="name" required placeholder="اكتبي اسمك هنا">
+        </div>
+
+        <div class="field">
+          <label for="phone">رقم الجوال *</label>
+          <input id="phone" type="tel" required placeholder="05xxxxxxxx">
+        </div>
+
+        <div class="field">
+          <label for="date">تاريخ الحجز *</label>
+          <input id="date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="time">الساعة المطلوبة *</label>
+          <select id="time" required>
+            <option value="">اختاري الوقت</option>
+            <option>09:00 AM</option><option>10:00 AM</option>
+            <option>11:00 AM</option><option>12:00 PM</option>
+            <option>01:00 PM</option><option>02:00 PM</option>
+            <option>03:00 PM</option><option>04:00 PM</option>
+            <option>05:00 PM</option><option>06:00 PM</option>
+            <option>07:00 PM</option><option>08:00 PM</option>
+            <option>09:00 PM</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="count">عدد الأشخاص *</label>
+          <input id="count" type="number" min="1" max="20" value="1" required>
+        </div>
+
+        <div class="field full">
+          <label for="services">الخدمات المطلوبة لكل شخص *</label>
+          <textarea id="services" required placeholder="اكتبي الخدمات المطلوبة لكل شخص بشكل منفصل، مثال:
+الشخص الأول: مكياج، تسريحة، تنظيف بشرة.
+الشخص الثاني: استشوار، قص شعر."></textarea>
+          <div class="hint">اكتبي خدمات كل شخص بوضوح لتسهيل مراجعة الطلب.</div>
+        </div>
+
+        <div class="field">
+          <label for="city">المدينة *</label>
+          <input id="city" required placeholder="اسم المدينة">
+        </div>
+
+        <div class="field">
+          <label for="district">الحي *</label>
+          <input id="district" required placeholder="اسم الحي">
+        </div>
+
+        <div class="field full">
+          <label for="location">رابط اللوكيشن *</label>
+          <input id="location" type="url" required placeholder="الصقي رابط موقع المنزل من الخرائط">
+          <div class="hint">يفضل نسخ رابط المشاركة من تطبيق الخرائط.</div>
+        </div>
+
+        <div class="field full">
+          <label for="homePhoto">صورة المنزل أو المدخل *</label>
+          <input id="homePhoto" type="file" accept="image/*" required>
+          <div class="hint">الصورة لن تُضمّن في بطاقة الحجز؛ أرفقيها مباشرة في محادثة واتساب.</div>
+        </div>
+
+        <div class="field full">
+          <label for="details">تفاصيل إضافية عن الوصول</label>
+          <textarea id="details" placeholder="رقم المبنى، لون الباب، وصف المدخل، تعليمات الوصول..."></textarea>
+        </div>
+      </div>
+
+      <button class="primary" type="submit">إنشاء بطاقة الحجز</button>
+    </form>
+
+    <div class="preview" id="preview" hidden>
+      <h2>بطاقة الحجز</h2>
+      <canvas id="bookingCanvas" width="900" height="1200"></canvas>
+      <div class="actions">
+        <button class="secondary" id="downloadBtn" type="button">تنزيل الصورة</button>
+        <button class="gold" id="shareBtn" type="button">مشاركة البطاقة</button>
+      </div>
+      <button class="primary" id="whatsappBtn" type="button">متابعة عبر واتساب</button>
+      <div class="notice">
+        عند فتح واتساب، أرسلي بطاقة الحجز ثم أرفقي صورة المنزل وتأكدي من إرسال اللوكيشن والتفاصيل الإضافية في المحادثة.
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <h2>طرق الدفع</h2>
+
+    <div class="payment-item"><strong>STC Pay</strong></div>
+    <div class="payment-item"><strong>Urpay</strong></div>
+    <div class="payment-item"><strong>D360</strong></div>
+    <div class="payment-item"><strong>Baraq</strong></div>
+    <p>رقم الدفع لجميع الوسائل:</p>
+  <div class="account" style="font-size:20px;font-weight:bold">
+    0552666241
+  </div>
+
+    <div class="payment-item">
+      <strong>مصرف الراجحي</strong>
+      <div class="account">393000010006086078201</div>
+    </div>
+
+    <div class="payment-item">
+      <strong>آيبان الراجحي</strong>
+      <div class="account">SA0680000393608016078201</div>
+    </div>
+
+    <div class="notice">
+      <strong>ملاحظات الدفع</strong><br>
+      • يتوفر جهاز ATM مع العاملة.<br>
+      • للتواصل بشأن تمارا، يرجى طلب رابط الدفع من الصالون عبر واتساب.<br>
+      • تأكدي من بيانات التحويل قبل إتمام الدفع.
+    </div>
+
+    <h2 style="margin-top:20px">للتواصل والاستفسار</h2>
+    <div class="social">
+      <div>واتساب: <b dir="ltr">0552666241</b></div>
+      <div>إنستغرام: <b dir="ltr">aljumana.stylek</b></div>
+      <div>سناب: <b dir="ltr">aljumana.stylek</b></div>
+    </div>
+
+    <a href="https://wa.me/966552666241" target="_blank" rel="noopener"
+       style="display:block;text-decoration:none">
+      <button class="primary" type="button">فتح واتساب الصالون</button>
+    </a>
+
+    <div class="notice">
+      يرجى التأكد من صحة جميع البيانات قبل الإرسال. إرسال الطلب لا يعني تأكيد الموعد؛ يتم التأكيد بعد مراجعة الطلب من فريق الصالون.
+    </div>
+  </aside>
+</main>
+
+<footer>AS ALJUMANA STYLEK ✦ BEAUTY WITH ELEGANCE</footer>
+
+<script>
+const form = document.getElementById('bookingForm');
+const preview = document.getElementById('preview');
+const canvas = document.getElementById('bookingCanvas');
+const ctx = canvas.getContext('2d');
+let bookingText = '';
+
+function getValue(id) {
+  return document.getElementById(id).value.trim();
+}
+
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(/\s+/);
+  let line = '';
+  for (const word of words) {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line, x, y);
+      y += lineHeight;
+      line = word;
+    } else {
+      line = test;
+    }
+  }
+  if (line) ctx.fillText(line, x, y);
+  return y + lineHeight;
+}
+
+function drawCard() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#fffaf4');
+  bg.addColorStop(1, '#f1dfd4');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = '#c69a58';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(28, 28, W - 56, H - 56);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#641b2b';
+  ctx.font = 'bold 42px Tahoma, Arial';
+  ctx.fillText('AS', W / 2, 100);
+
+  ctx.font = 'bold 31px Georgia, serif';
+  ctx.fillText('ALJUMANA STYLEK', W / 2, 145);
+
+  ctx.font = 'bold 34px Tahoma, Arial';
+  ctx.fillText('بطاقة بيانات الحجز', W / 2, 215);
+
+  ctx.strokeStyle = '#c69a58';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(90, 245);
+  ctx.lineTo(W - 90, 245);
+  ctx.stroke();
+
+  const rows = [
+    ['الاسم', getValue('name')],
+    ['رقم الجوال', getValue('phone')],
+    ['تاريخ الحجز', getValue('date')],
+    ['الساعة المطلوبة', getValue('time')],
+    ['عدد الأشخاص', getValue('count')],
+    ['المدينة', getValue('city')],
+    ['الحي', getValue('district')],
+    ['الخدمات لكل شخص', getValue('services')],
+    ['اللوكيشن', getValue('location')],
+    ['تفاصيل إضافية', getValue('details') || 'لا توجد']
+  ];
+
+  let y = 300;
+  for (const [label, value] of rows) {
+    ctx.fillStyle = '#641b2b';
+    ctx.font = 'bold 23px Tahoma, Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(label + ':', W - 75, y);
+
+    ctx.fillStyle = '#35151c';
+    ctx.font = '21px Tahoma, Arial';
+    y += 35;
+    y = wrapText(value, W - 75, y, W - 150, 30) + 17;
+
+    if (y > H - 130) break;
+  }
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#641b2b';
+  ctx.font = 'bold 24px Tahoma, Arial';
+  ctx.fillText('شكرًا لاختياركِ الجمانة ستايلك ♥', W / 2, H - 75);
+
+  bookingText = rows.map(([k,v]) => `${k}: ${v}`).join('\n');
+}
+
+function makeBlob() {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  drawCard();
+  preview.hidden = false;
+  preview.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.download = 'AS-booking.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+});
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const blob = await makeBlob();
+  if (!blob) {
+    alert('تعذر إنشاء الصورة. حاولي تنزيلها أولًا.');
+    return;
+  }
+
+  const file = new File([blob], 'AS-booking.png', {type:'image/png'});
+  if (navigator.canShare && navigator.canShare({files:[file]}) && navigator.share) {
+    try {
+      await navigator.share({
+        files:[file],
+        title:'حجز AS الجمانة ستايلك',
+        text:'بطاقة بيانات الحجز'
+      });
+    } catch (e) {
+      if (e.name !== 'AbortError') alert('يمكنك تنزيل البطاقة ثم إرفاقها في واتساب.');
+    }
+  } else {
+    alert('هذا المتصفح لا يدعم مشاركة الصورة مباشرة. نزّلي البطاقة ثم أرفقيها في واتساب.');
+  }
+});
+
+document.getElementById('whatsappBtn').addEventListener('click', () => {
+  const message =
+    'طلب حجز جديد - AS الجمانة ستايلك\n\n' +
+    bookingText +
+    '\n\nيرجى مراجعة الطلب وتأكيد الموعد.';
+
+  window.open(
+    'https://wa.me/966552666241?text=' + encodeURIComponent(message),
+    '_blank',
+    'noopener'
+  );
+
+  alert('بعد فتح واتساب، أرفقي صورة بطاقة الحجز وصورة المنزل، وأرسلي رابط اللوكيشن والتفاصيل الإضافية.');
+});
+</script>
+</body>
+</html>
