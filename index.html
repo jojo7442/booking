@@ -271,7 +271,7 @@ footer{text-align:center;padding:20px;color:#805e5d;font-size:12px}
     <div id="map"></div>
     <div id="mapPicked" class="location-summary">لم يتم تحديد نقطة بعد.</div>
     <div id="permissionStatus" class="permission-status">لن يتم طلب الموقع إلا بعد الضغط على زر «السماح بتحديد موقعي».</div>
-    <div class="map-actions"><button class="secondary" id="locateBtn" type="button">السماح بتحديد موقعي</button><button class="gold" id="confirmMapBtn" type="button">تأكيد الموقع</button><button class="secondary" id="closeMapBtn" type="button">إلغاء</button></div>
+    <div class="map-actions"><button class="secondary" id="locateBtn" type="button">السماح بتحديد موقعي</button><button class="gold" id="confirmLocation" type="button">تأكيد الموقع</button><button class="secondary" id="closeMapBtn" type="button">إلغاء</button></div>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -282,22 +282,90 @@ const canvas = document.getElementById('bookingCanvas');
 const ctx = canvas.getContext('2d');
 const reviewPanel = document.getElementById('reviewPanel');
 const reviewGrid = document.getElementById('reviewGrid');
-let bookingText = '', map, marker, selectedLat=null, selectedLng=null;
+let bookingText = '';
+let map = null;
+let marker = null;
+let selectedLat = null;
+let selectedLng = null;
 const getValue=id=>document.getElementById(id).value.trim();
 const fields=[['name','الاسم'],['phone','رقم الجوال'],['date','تاريخ الحجز'],['time','الساعة المطلوبة'],['count','عدد الأشخاص'],['city','المدينة'],['district','الحي'],['nationalAddress','العنوان الوطني المختصر'],['services','الخدمات لكل شخص'],['location','رابط الموقع'],['details','تفاصيل إضافية']];
 function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function openMapModal(){document.getElementById('mapModal').classList.add('open');if(!map){if(typeof L==='undefined'){document.getElementById('map').innerHTML='<div style=\"padding:24px;text-align:center;color:#641b2b\">تعذر تحميل الخريطة. تأكدي من اتصال الإنترنت ثم أعيدي فتح الصفحة.</div>';return}map=L.map('map').setView([26.5612,50.0963],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);map.on('click',e=>pickPoint(e.latlng.lat,e.latlng.lng))}else setTimeout(()=>map.invalidateSize(),200)}
-function initMap(){openMapModal()}
-function closeMapModal(){document.getElementById('mapModal').classList.remove('open')}
-async function pickPoint(lat,lng){selectedLat=lat;selectedLng=lng;if(marker)marker.setLatLng([lat,lng]);else marker=L.marker([lat,lng]).addTo(map);document.getElementById('mapPicked').innerHTML=`<strong>النقطة المحددة:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>جاري قراءة العنوان...`;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=ar`);const d=await r.json();const a=d.address||{};const city=a.city||a.town||a.village||a.municipality||'';const district=a.suburb||a.neighbourhood||a.city_district||'';if(city&&!getValue('city'))document.getElementById('city').value=city;if(district&&!getValue('district'))document.getElementById('district').value=district;document.getElementById('mapPicked').innerHTML=`<strong>العنوان التقريبي:</strong> ${esc(d.display_name||'تم تحديد الموقع')}<br><small>${lat.toFixed(6)}, ${lng.toFixed(6)}</small>`}catch(e){document.getElementById('mapPicked').innerHTML=`<strong>تم تحديد الموقع:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}`}}
-document.getElementById('openMapBtn').addEventListener('click',openMapModal);
-document.getElementById('closeMapBtn').addEventListener('click',closeMapModal);
-document.getElementById('locateBtn').onclick=()=>{const st=document.getElementById('permissionStatus');if(!navigator.geolocation){st.textContent='المتصفح لا يدعم تحديد الموقع. اختاري النقطة يدويًا على الخريطة.';return}st.textContent='جاري طلب إذن الموقع...';navigator.geolocation.getCurrentPosition(p=>{st.textContent='تم السماح بالموقع وتحديد موقعك على الخريطة.';map.setView([p.coords.latitude,p.coords.longitude],16);pickPoint(p.coords.latitude,p.coords.longitude)},e=>{st.textContent=e.code===1?'تم رفض إذن الموقع. يمكنكِ اختيار النقطة يدويًا على الخريطة.':'تعذر تحديد الموقع حاليًا. يمكنكِ اختيار النقطة يدويًا على الخريطة.'})};
-document.getElementById('confirmMapBtn').addEventListener('click',function(){if(selectedLat===null||selectedLng===null)return alert('الرجاء النقر على الخريطة لتحديد الموقع أولاً.');document.getElementById('latitude').value=selectedLat;document.getElementById('longitude').value=selectedLng;document.getElementById('location').value=`https://www.google.com/maps?q=${selectedLat},${selectedLng}`;document.getElementById('locationSummary').innerHTML=`<strong>تم اختيار الموقع:</strong> ${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;const g=document.getElementById('googleMapsBtn');g.href=`https://www.google.com/maps/search/?api=1&query=${selectedLat},${selectedLng}`;g.hidden=false;closeMapModal()});
-function wrapText(text,x,y,maxWidth,lineHeight){const words=text.split(/\s+/);let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y);y+=lineHeight;line=word}else line=test}if(line)ctx.fillText(line,x,y);return y+lineHeight}
-function drawCard(){const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#fffaf4');bg.addColorStop(1,'#f1dfd4');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);ctx.strokeStyle='#c69a58';ctx.lineWidth=4;ctx.strokeRect(28,28,W-56,H-56);ctx.textAlign='center';ctx.fillStyle='#641b2b';ctx.font='bold 42px Tahoma,Arial';ctx.fillText('AS',W/2,100);ctx.font='bold 31px Georgia,serif';ctx.fillText('ALJUMANA STYLEK',W/2,145);ctx.font='bold 34px Tahoma,Arial';ctx.fillText('بطاقة بيانات الحجز',W/2,215);ctx.strokeStyle='#c69a58';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,245);ctx.lineTo(W-90,245);ctx.stroke();const rows=fields.map(([id,label])=>[label,getValue(id)||'لا توجد']);let y=300;for(const [label,value] of rows){ctx.fillStyle='#641b2b';ctx.font='bold 23px Tahoma,Arial';ctx.textAlign='right';ctx.fillText(label+':',W-75,y);ctx.fillStyle='#35151c';ctx.font='21px Tahoma,Arial';y+=35;y=wrapText(value,W-75,y,W-150,30)+17;if(y>H-130)break}ctx.textAlign='center';ctx.fillStyle='#641b2b';ctx.font='bold 24px Tahoma,Arial';ctx.fillText('شكرًا لاختياركِ الجمانة ستايلك ♥',W/2,H-75);bookingText=rows.map(([k,v])=>`${k}: ${v}`).join('\n')+`\nإحداثيات الموقع: ${selectedLat||''}, ${selectedLng||''}`}
-function buildReview(){reviewGrid.innerHTML=fields.map(([id,label])=>`<div class="${id==='services'||id==='details'?'review-full':''}"><b>${label}</b>${esc(getValue(id)||'لا توجد')}</div>`).join('');reviewPanel.hidden=false;preview.hidden=false;drawCard();reviewPanel.scrollIntoView({behavior:'smooth',block:'start'})}
-const confirmLocation=document.getElementById('confirmLocation');if(confirmLocation)confirmLocation.addEventListener('click',()=>document.getElementById('confirmMapBtn').click());
+function openMapModal() {
+  document.getElementById('mapModal').classList.add('open');
+  if (!map) {
+    if (typeof L === 'undefined') {
+      document.getElementById('map').innerHTML = '<div style="padding:24px;text-align:center;color:#641b2b">تعذر تحميل الخريطة. تأكدي من اتصال الإنترنت ثم أعيدي فتح الصفحة.</div>';
+      return;
+    }
+    map = L.map('map').setView([26.5612, 50.0963], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    map.on('click', function(e) {
+      selectedLat = e.latlng.lat;
+      selectedLng = e.latlng.lng;
+      if (marker) marker.setLatLng([selectedLat, selectedLng]);
+      else marker = L.marker([selectedLat, selectedLng]).addTo(map);
+      const picked = document.getElementById('mapPicked');
+      if (picked) picked.innerHTML = `<strong>النقطة المحددة:</strong> ${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+    });
+  }
+  setTimeout(() => { map.invalidateSize(); }, 300);
+}
+
+function closeMapModal() {
+  document.getElementById('mapModal').classList.remove('open');
+}
+
+function locateUserCurrentPosition() {
+  if (navigator.geolocation) {
+    const status = document.getElementById('permissionStatus');
+    if (status) status.textContent = 'جاري طلب إذن الموقع...';
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        selectedLat = lat;
+        selectedLng = lng;
+        map.setView([lat, lng], 16);
+        if (marker) marker.setLatLng([lat, lng]);
+        else marker = L.marker([lat, lng]).addTo(map);
+        if (status) status.textContent = 'تم السماح بالموقع وتحديد موقعك على الخريطة.';
+        const picked = document.getElementById('mapPicked');
+        if (picked) picked.innerHTML = `<strong>موقعك الحالي:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      },
+      (error) => {
+        console.warn('تعذر تحديد الموقع الجغرافي تلقائياً: ', error.message);
+        const status = document.getElementById('permissionStatus');
+        if (status) status.textContent = error.code === 1 ? 'تم رفض إذن الموقع. يمكنكِ اختيار النقطة يدويًا.' : 'تعذر تحديد الموقع حاليًا. اختاري النقطة يدويًا على الخريطة.';
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  } else {
+    alert('متصفحك لا يدعم خاصية تحديد الموقع الجغرافي.');
+  }
+}
+
+document.getElementById('openMapBtn').addEventListener('click', openMapModal);
+document.getElementById('closeMapBtn').addEventListener('click', closeMapModal);
+document.getElementById('locateBtn').addEventListener('click', locateUserCurrentPosition);
+document.getElementById('confirmLocation').addEventListener('click', function() {
+  if (selectedLat !== null && selectedLng !== null) {
+    console.log(`تم تحديد الموقع: Lat: ${selectedLat}, Lng: ${selectedLng}`);
+    document.getElementById('latitude').value = selectedLat;
+    document.getElementById('longitude').value = selectedLng;
+    document.getElementById('location').value = `https://www.google.com/maps?q=${selectedLat},${selectedLng}`;
+    document.getElementById('locationSummary').innerHTML = `<strong>تم اختيار الموقع:</strong> ${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+    const googleMapsBtn = document.getElementById('googleMapsBtn');
+    googleMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${selectedLat},${selectedLng}`;
+    googleMapsBtn.hidden = false;
+    closeMapModal();
+  } else {
+    alert('الرجاء النقر على الخريطة لتحديد الموقع أو استخدام زر تحديد موقعك الحالي أولاً.');
+  }
+});
+
 document.getElementById('copyNationalBtn').onclick=async()=>{const v=getValue('nationalAddress');if(!v)return alert('اكتبي العنوان الوطني المختصر أولاً.');try{await navigator.clipboard.writeText(v.toUpperCase());alert('تم نسخ العنوان الوطني المختصر.')}catch(e){document.getElementById('nationalAddress').select();alert('حددي النص ثم انسخيه يدويًا.')}};
 form.addEventListener('submit',e=>{e.preventDefault();if(!selectedLat||!selectedLng)return alert('اختاري موقع المنزل من الخريطة قبل المتابعة.');const na=getValue('nationalAddress');if(na&&!/^[A-Za-z]{4}\d{4}$/i.test(na))return alert('صيغة العنوان الوطني المختصر غير صحيحة. اكتبي 4 أحرف ثم 4 أرقام، مثل ABCE1234.');buildReview()});
 document.getElementById('editBookingBtn').onclick=()=>{reviewPanel.hidden=true;document.getElementById('name').focus();window.scrollTo({top:form.offsetTop-20,behavior:'smooth'})};
